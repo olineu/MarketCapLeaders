@@ -1,6 +1,9 @@
 import React from 'react';
 import './App.css'; // You can create an App.css file for styling
 
+// Import the CompanyList component
+import CompanyList from './CompanyList'; // Make sure the path is correct
+
 function App() {
   return (
     <div className="App">
