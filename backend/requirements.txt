@@ -1,0 +1,4 @@
+httpx
+yfinance
+FastAPI
+get-all-tickers
