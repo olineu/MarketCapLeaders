@@ -1,6 +1,5 @@
 from fastapi import FastAPI, Query
 import yfinance as yf
-from get_all_tickers import get_tickers
 
 app = FastAPI()
 
@@ -34,15 +33,5 @@ async def get_closing_quote(
             "shares_outstanding": shares_outstanding,
             "market_cap": market_cap,
         }
-    except Exception as e:
-        return {"error": str(e)}
-
-@app.get("/get_all_tickers")
-async def get_all_tickers():
-    try:
-        # Fetch all tickers from US exchanges (NYSE, NASDAQ, AMEX)
-        all_us_tickers = get_tickers.get_tickers()
-
-        return {"all_tickers": all_us_tickers}
     except Exception as e:
         return {"error": str(e)}
