@@ -1,37 +1,21 @@
-from fastapi import FastAPI, Query
-import yfinance as yf
+from fastapi import FastAPI
+from database import MarketCapDatabase
+from pymongo import MongoClient
 
 app = FastAPI()
+db_url = "mongodb://localhost:27017/"
+db_name = "market_cap_db"
+db = MarketCapDatabase(db_url, db_name)
 
-@app.get("/get_closing_quote")
-async def get_closing_quote(
-    symbol: str = Query(..., description="Stock symbol"),
-    date: str = Query(..., description="Date in YYYY-MM-DD format"),
-):
-    try:
-        # Use yfinance to fetch historical data for the specified date
-        stock = yf.Ticker(symbol)
-        historical_data = stock.history(period="1d", start=date, end=date)
-
-        if historical_data.empty:
-            return {"error": "No data available for the specified date"}
-
-        # Extract the closing quote and number of shares outstanding (market cap)
-        closing_quote = historical_data["Close"].iloc[0]
-        shares_outstanding = stock.info.get("sharesOutstanding")
-
-        if shares_outstanding is None:
-            return {"error": "Shares outstanding data not available"}
-
-        # Calculate market cap
-        market_cap = closing_quote * shares_outstanding
-
+@app.get("/get_stock_data")
+async def get_stock_data(symbol: str):
+    stock_data = db.db.stock_data.find_one({"symbol": symbol})
+    if stock_data:
         return {
-            "symbol": symbol,
-            "date": date,
-            "closing_quote": closing_quote,
-            "shares_outstanding": shares_outstanding,
-            "market_cap": market_cap,
+            "symbol": stock_data["symbol"],
+            "closing_price": stock_data["closing_price"],
+            "market_cap": stock_data["market_cap"],
+            "last_update": stock_data["last_update"],
         }
-    except Exception as e:
-        return {"error": str(e)}
+    else:
+        return {"error": "Symbol not found"}

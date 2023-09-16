@@ -1,0 +1,7 @@
+httpx
+yfinance
+FastAPI
+get-all-tickers
+python-decouple
+pandas
+pytest
